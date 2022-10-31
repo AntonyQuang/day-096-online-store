@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 # Creating a Flask instance
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "SecsadasdsaretKey"
+app.config["SECRET_KEY"] = "SecretKey"
 # Connect to the database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("TRUE_DATABASE_URL", "sqlite:///shop.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -45,7 +45,7 @@ class User(UserMixin, db.Model):
     postcode = db.Column(db.String(10), nullable=False)
     city = db.Column(db.String(200), nullable=False)
     country = db.Column(db.String(200), nullable=False)
-    orders = db.relationship('BlogPost', back_populates="user")
+    orders = db.relationship('Item', back_populates="user")
 
 
 class Orders(db.Model):
@@ -84,10 +84,9 @@ def load_user(user_id):
 
 @app.route('/')
 def home():
-    items = Item.query.all()
-    return "hello"
-    return render_template("index.html", items=items, logged_in=current_user.is_authenticated,
-                           user_id=current_user.get_id())
+    # items = Item.query.all()
+
+    return render_template("index.html")
 
 
 @app.route('/register', methods=["GET", "POST"])
@@ -127,9 +126,14 @@ def register():
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user)
-            return redirect(url_for('get_all_posts'))
+            return redirect(url_for('home'))
     return render_template("register.html", form=register_form, logged_in=current_user.is_authenticated,
                            user_id=current_user.get_id())
+
+
+@app.route('/register', methods=["GET", "POST"])
+def login():
+    return "hello"
 
 
 if __name__ == "__main__":
