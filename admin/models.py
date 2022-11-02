@@ -1,5 +1,5 @@
 from admin import db
-
+from admin import app
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -10,3 +10,6 @@ class User(db.Model):
     profile = db.Column(db.String(180), unique=False, nullable=False, default="profile.jpg")
 
 
+with app.app_context():
+    db.create_all()
+    db.session.commit()

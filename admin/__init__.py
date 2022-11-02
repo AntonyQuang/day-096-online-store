@@ -11,5 +11,3 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
-with app.app_context():
-    db.create_all()
