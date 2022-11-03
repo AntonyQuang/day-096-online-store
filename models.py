@@ -1,5 +1,5 @@
-from admin import db
-from admin import app
+from __init__ import db
+from __init__ import app
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -9,6 +9,15 @@ class User(db.Model):
     password = db.Column(db.String(180), unique=False, nullable=False)
     profile = db.Column(db.String(180), unique=False, nullable=False, default="profile.jpg")
 
+
+class Brand(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), nullable=False, unique=True)
+
+
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), nullable=False, unique=True)
 
 with app.app_context():
     db.create_all()

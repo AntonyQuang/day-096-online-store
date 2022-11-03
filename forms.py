@@ -1,33 +1,21 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, EmailField
-from wtforms.validators import DataRequired, URL, Length, Email
+from wtforms import Form, BooleanField, StringField, PasswordField, validators
 
 
-##WTForm
-
-class CreateItemForm(FlaskForm):
-    title = StringField("Blog Post Title", validators=[DataRequired()])
-    subtitle = StringField("Subtitle", validators=[DataRequired()])
-    img_url = StringField("Blog Image URL", validators=[DataRequired(), URL()])
-    description = StringField("Item Description", validators=[DataRequired()])
-    submit = SubmitField("Submit Post")
-
-
-class RegisterForm(FlaskForm):
-    email = EmailField("Email", validators=[DataRequired(), Email()])
-    password = PasswordField("Password", validators=[DataRequired()])
-    first_name = StringField("First Name", validators=[DataRequired()])
-    last_name = StringField("Last Name", validators=[DataRequired()])
-    address_1 = StringField("Address 1",  validators=[DataRequired()])
-    address_2 = StringField("Address 2")
-    city = StringField("City", validators=[DataRequired()])
-    postcode = StringField("Post Code",  validators=[DataRequired(), Length(min=4, max=10)])
-    country = StringField("Country", validators=[DataRequired()])
-    submit = SubmitField("Sign me up!")
+class RegistrationForm(Form):
+    name = StringField('Name', [validators.Length(min=4, max=25)])
+    username = StringField('Username', [validators.Length(min=4, max=25)])
+    email = StringField('Email Address', [validators.Length(min=6, max=35), validators.Email()])
+    password = PasswordField('New Password', [
+        validators.DataRequired(),
+        validators.EqualTo('confirm', message='Passwords must match')
+    ])
+    confirm = PasswordField('Repeat Password')
 
 
-class LogInForm(FlaskForm):
-    email = EmailField("Email", validators=[DataRequired()])
-    password = PasswordField("Password", validators=[DataRequired()])
-    submit = SubmitField("Let me in!")
+class LoginForm(Form):
+    email = StringField('Email Address', [validators.Length(min=6, max=35), validators.Email()])
+    password = PasswordField('New Password', [
+        validators.DataRequired(),
+    ])
+
 

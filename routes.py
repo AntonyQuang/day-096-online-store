@@ -1,12 +1,12 @@
 from flask import render_template, session, request, url_for, flash, redirect
-from admin.forms import RegistrationForm, LoginForm
-from admin import app, db, bcrypt
-from .models import User
+from forms import RegistrationForm, LoginForm
+from __init__ import app, db, bcrypt
+from models import User
 
 
 @app.route('/')
 def home():
-    return render_template('/index.html', title="Admin Page")
+    return render_template('index.html', title="Admin Page")
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -24,7 +24,7 @@ def register():
             db.session.commit()
         flash(f"Welcome {form.name.data}, thank you for registering", "success")
         return redirect(url_for('home'))
-    return render_template('/register.html', form=form, title="Registration Page")
+    return render_template('register.html', form=form, title="Registration Page")
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -38,4 +38,9 @@ def login():
             return redirect(request.args.get('next') or url_for("admin"))
         else:
             flash("The email or password is not correct. Please try again", "danger")
-    return render_template('/login.html', form=form, title="Login Page")
+    return render_template('login.html', form=form, title="Login Page")
+
+
+@app.route('/addbrand', methods=["GET", "POST"])
+def addbrand():
+    return render_template('addbrand.html')
