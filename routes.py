@@ -1,7 +1,7 @@
 from flask import render_template, session, request, url_for, flash, redirect
 from forms import RegistrationForm, LoginForm
 from __init__ import app, db, bcrypt
-from models import User
+from models import User, Brand, Category
 
 
 @app.route('/')
@@ -43,4 +43,27 @@ def login():
 
 @app.route('/addbrand', methods=["GET", "POST"])
 def addbrand():
+    if request.method == "POST":
+        getbrand = request.form.get("brand")
+        print(getbrand)
+        brand = Brand(name=getbrand)
+        flash(f"The Brand {getbrand} has been added to your database.", "success")
+        with app.app_context():
+            db.session.add(brand)
+            db.session.commit()
+        return redirect(url_for('addbrand'))
+    return render_template('addbrand.html', brands="brands")
+
+
+@app.route('/addcat', methods=["GET", "POST"])
+def addcat():
+    if request.method == "POST":
+        getcat = request.form.get("category")
+        print(getcat)
+        cat = Category(name=getcat)
+        flash(f"The Category {getcat} has been added to your database.", "success")
+        with app.app_context():
+            db.session.add(cat)
+            db.session.commit()
+        return redirect(url_for('addbrand'))
     return render_template('addbrand.html')
