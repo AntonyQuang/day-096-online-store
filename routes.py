@@ -1,5 +1,5 @@
 from flask import render_template, session, request, url_for, flash, redirect
-from forms import RegistrationForm, LoginForm
+from forms import RegistrationForm, LoginForm, AddProductsForm
 from __init__ import app, db, bcrypt
 from models import User, Brand, Category
 
@@ -67,3 +67,11 @@ def addcat():
             db.session.commit()
         return redirect(url_for('addbrand'))
     return render_template('addbrand.html')
+
+
+@app.route("/addproduct", methods=["GET", "POST"])
+def addproduct():
+    brands = Brand.query.all()
+    categories = Category.query.all()
+    form = AddProductsForm(request.form)
+    return render_template("addproduct.html", form=form, title="Add product", brands=brands, categories=categories)
