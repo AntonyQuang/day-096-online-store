@@ -21,11 +21,7 @@
                 {{ render_field(form.stock, class="form-control", placeholder="Add product stock") }}
                 {{ render_field(form.colors, class="form-control", placeholder="Add product colors") }}
                 {{ render_field(form.description, class="form-control", placeholder="Add description", rows="10") }}
-                <div class="row">
-                <div class="col-md-4">{{ render_field(form.image_1, class="form-control", placeholder="Add Image 1") }}</div>
-                <div class="col-md-4">{{ render_field(form.image_2, class="form-control", placeholder="Add Image 2") }}</div>
-                <div class="col-md-4">{{ render_field(form.image_3, class="form-control", placeholder="Add Image 3") }}</div>
-                </div>
+
 
                 <label for="brand">Add a brand</label>
                 <select name="brand" id="brand" class="form-control" required>
@@ -43,8 +39,12 @@
                     {% endfor %}
                 </select>
 
+                <div class="row">
+                <div class="col-md-4">{{ render_field(form.image_1, class="form-control", placeholder="Add Image 1") }}</div>
+                <div class="col-md-4">{{ render_field(form.image_2, class="form-control", placeholder="Add Image 2") }}</div>
+                <div class="col-md-4">{{ render_field(form.image_3, class="form-control", placeholder="Add Image 3") }}</div>
+                </div>
             </dl>
-            <input type="file" name="photo">
           </div>
           <p><input type=submit value="Add product" class="btn btn-dark mt-2" >
         </form>

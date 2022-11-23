@@ -1,8 +1,8 @@
 from flask import render_template, session, request, url_for, flash, redirect
 from forms import RegistrationForm, LoginForm, AddProductsForm
-from __init__ import app, db, bcrypt
-from models import User, Brand, Category
-
+from __init__ import app, db, bcrypt, photos
+from models import User, Brand, Category, AddProduct
+import secrets
 
 @app.route('/')
 def home():
@@ -74,4 +74,35 @@ def addproduct():
     brands = Brand.query.all()
     categories = Category.query.all()
     form = AddProductsForm(request.form)
+    if request.method == "POST":
+        name = form.name.data
+        price = form.price.data
+        discount = form.discount.data
+        stock = form.stock.data
+        colors = form.colors.data
+        description = form.description.data
+        # brand and category are not part of the AddProducts class
+        brand = request.form.get('brand')
+        category = request.form.get('category')
+        image_1 = photos.save(request.files.get("image_1"), name=secrets.token_hex(10)+".")
+        image_2 = photos.save(request.files.get("image_2"), name=secrets.token_hex(10)+".")
+        image_3 = photos.save(request.files.get("image_3"), name=secrets.token_hex(10)+".")
+        addpro = AddProduct(
+            name=name,
+            price=price,
+            discount=discount,
+            stock=stock,
+            colors=colors,
+            description=description,
+            brand_id=brand,
+            category_id=category,
+            image_1=image_1,
+            image_2=image_2,
+            image_3=image_3,
+        )
+        with app.app_context():
+            db.session.add(addpro)
+            flash(f"The product {name} has been added to the database", "success")
+            db.session.commit()
+        return redirect(url_for('home'))
     return render_template("addproduct.html", form=form, title="Add product", brands=brands, categories=categories)
