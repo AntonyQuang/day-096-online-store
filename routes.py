@@ -2,11 +2,37 @@ from flask import render_template, session, request, url_for, flash, redirect
 from forms import RegistrationForm, LoginForm, AddProductsForm
 from __init__ import app, db, bcrypt, photos
 from models import User, Brand, Category, AddProduct
+
 import secrets
 
+
 @app.route('/')
-def home():
-    return render_template('index.html', title="Admin Page")
+def admin():
+    if 'email' not in session:
+        flash(f'Please log in first', 'danger')
+        return redirect(url_for('login'))
+    products = AddProduct.query.all()
+    return render_template('index.html', title="Admin Page", products=products)
+
+
+@app.route('/brands')
+def brands():
+    if 'email' not in session:
+        flash(f'Please log in first', 'danger')
+        return redirect(url_for('login'))
+    brands = Brand.query.order_by(Brand.id.desc()).all()
+    return render_template('brand.html', title="Brand Page", brands=brands)
+
+
+@app.route('/categories')
+def categories():
+    if 'email' not in session:
+        flash(f'Please log in first', 'danger')
+        return redirect(url_for('login'))
+    categories = Category.query.order_by(Category.id.desc()).all()
+    return render_template('brand.html', title="Brand Page", categories=categories)
+
+
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -23,7 +49,7 @@ def register():
             db.session.add(user)
             db.session.commit()
         flash(f"Welcome {form.name.data}, thank you for registering", "success")
-        return redirect(url_for('home'))
+        return redirect(url_for('admin'))
     return render_template('register.html', form=form, title="Registration Page")
 
 
@@ -43,6 +69,9 @@ def login():
 
 @app.route('/addbrand', methods=["GET", "POST"])
 def addbrand():
+    if 'email' not in session:
+        flash(f'Please log in first', 'danger')
+        return redirect(url_for('login'))
     if request.method == "POST":
         getbrand = request.form.get("brand")
         print(getbrand)
@@ -57,6 +86,9 @@ def addbrand():
 
 @app.route('/addcat', methods=["GET", "POST"])
 def addcat():
+    if 'email' not in session:
+        flash(f'Please log in first', 'danger')
+        return redirect(url_for('login'))
     if request.method == "POST":
         getcat = request.form.get("category")
         print(getcat)
@@ -104,5 +136,5 @@ def addproduct():
             db.session.add(addpro)
             flash(f"The product {name} has been added to the database", "success")
             db.session.commit()
-        return redirect(url_for('home'))
+        return redirect(url_for('admin'))
     return render_template("addproduct.html", form=form, title="Add product", brands=brands, categories=categories)
