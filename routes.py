@@ -33,8 +33,6 @@ def categories():
     return render_template('brand.html', title="Brand Page", categories=categories)
 
 
-
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm(request.form)
@@ -84,6 +82,20 @@ def addbrand():
     return render_template('addbrand.html', brands="brands")
 
 
+@app.route('/updatebrand/<int:id>', methods=["GET", "POST"])
+def updatebrand(id):
+    if 'email' not in session:
+        flash(f'Please log in first', 'danger')
+        return redirect(url_for('login'))
+    updatebrand = Brand.query.get_or_404(id)
+    brand = request.form.get('brand')
+    if request.method == "POST":
+        updatebrand.name = brand
+        db.session.commit()
+        flash(f'Your brand has been updated', 'success')
+        return redirect(url_for('brands'))
+    return render_template('updatebrand.html', title='Update Brand Page', updatebrand=updatebrand)
+
 @app.route('/addcat', methods=["GET", "POST"])
 def addcat():
     if 'email' not in session:
@@ -97,8 +109,23 @@ def addcat():
         with app.app_context():
             db.session.add(cat)
             db.session.commit()
-        return redirect(url_for('addbrand'))
+        return redirect(url_for('addcat'))
     return render_template('addbrand.html')
+
+
+@app.route('/updatecat/<int:id>', methods=["GET", "POST"])
+def updatecat(id):
+    if 'email' not in session:
+        flash(f'Please log in first', 'danger')
+        return redirect(url_for('login'))
+    updatecat = Category.query.get_or_404(id)
+    cat = request.form.get('category')
+    if request.method == "POST":
+        updatecat.name = cat
+        db.session.commit()
+        flash(f'Your brand has been updated', 'success')
+        return redirect(url_for('categories'))
+    return render_template('updatebrand.html', title='Update Category Page', updatecat=updatecat)
 
 
 @app.route("/addproduct", methods=["GET", "POST"])
