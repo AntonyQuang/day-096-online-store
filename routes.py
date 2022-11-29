@@ -1,9 +1,9 @@
-from flask import render_template, session, request, url_for, flash, redirect
+from flask import render_template, session, request, url_for, flash, redirect, current_app
 from forms import RegistrationForm, LoginForm, AddProductsForm
 from __init__ import app, db, bcrypt, photos
 from models import User, Brand, Category, AddProduct
 
-import secrets
+import secrets, os
 
 
 @app.route('/')
@@ -183,6 +183,24 @@ def updateproduct(id):
         product.brand_id = brand
         product.colors = form.colors.data
         product.description = form.description.data
+        if request.files.get('image_1'):
+            try:
+                os.unlink(os.path.join(current_app.root_path, "static/images" + product.image_1))
+                product.image_1 = photos.save(request.files.get("image_1"), name=secrets.token_hex(10) + ".")
+            except:
+                product.image_1 = photos.save(request.files.get("image_1"), name=secrets.token_hex(10) + ".")
+        if request.files.get('image_2'):
+            try:
+                os.unlink(os.path.join(current_app.root_path, "static/images" + product.image_1))
+                product.image_2 = photos.save(request.files.get("image_2"), name=secrets.token_hex(10) + ".")
+            except:
+                product.image_12 = photos.save(request.files.get("image_2"), name=secrets.token_hex(10) + ".")
+        if request.files.get('image_3'):
+            try:
+                os.unlink(os.path.join(current_app.root_path, "static/images" + product.image_1))
+                product.image_3 = photos.save(request.files.get("image_3"), name=secrets.token_hex(10) + ".")
+            except:
+                product.image_3 = photos.save(request.files.get("image_3"), name=secrets.token_hex(10) + ".")
         db.session.commit()
         flash(f'Your product has been updated', "success")
         return redirect(url_for('admin'))

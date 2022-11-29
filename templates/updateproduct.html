@@ -23,7 +23,7 @@
                 {{ render_field(form.description, class="form-control", placeholder="Add description", rows="10") }}
 
 
-                <label for="brand">Add a brand</label>
+                <label for="brand">Select a brand</label>
                 <select name="brand" id="brand" class="form-control" required>
                     <option value="{{product.brand_id}}">{{product.brand.name}}</option>
                     {% for brand in brands %}
@@ -31,7 +31,7 @@
                     {% endfor %}
                 </select>
 
-                <label for="category">Add a category</label>
+                <label for="category">Select a category</label>
                 <select name="category" id="category" class="form-control" required>
                     <option value="{{product.category_id}}">{{product.category.name}}</option>
                     {% for category in categories %}
@@ -39,10 +39,10 @@
                     {% endfor %}
                 </select>
                 <div class="container">
-                <div class="row">
-                <div class="col-md-4"><input type="file" name="image_1" class="form-control"></div>
-                <div class="col-md-4"><input type="file" name="image_2" class="form-control"></div>
-                <div class="col-md-4"><input type="file" name="image_3" class="form-control"></div>
+                    <div class="row">
+                <div class="col-md-4, ">{{ render_field(form.image_1, class="form-control", placeholder="Add Image 1", required=True) }}</div>
+                <div class="col-md-4, required">{{ render_field(form.image_2, class="form-control", placeholder="Add Image 2", required=True) }}</div>
+                <div class="col-md-4, required">{{ render_field(form.image_3, class="form-control", placeholder="Add Image 3", required=True) }}</div>
                 </div>
                 </div>
             </dl>
