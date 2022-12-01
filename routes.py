@@ -96,6 +96,18 @@ def updatebrand(id):
         return redirect(url_for('brands'))
     return render_template('updatebrand.html', title='Update Brand Page', updatebrand=updatebrand)
 
+
+@app.route('/deletebrand/<int:id>', methods=["POST"])
+def deletebrand(id):
+    brand = Brand.query.get_or_404(id)
+    if request.method == "POST":
+        db.session.delete(brand)
+        db.session.commit()
+        flash(f'The brand {brand.name} was deleted from your database', 'success')
+        return redirect(url_for('admin'))
+    flash(f'The brand {brand.name} cannot be deleted', 'warning')
+    return redirect(url_for('admin'))
+
 @app.route('/addcat', methods=["GET", "POST"])
 def addcat():
     if 'email' not in session:
@@ -126,6 +138,18 @@ def updatecat(id):
         flash(f'Your brand has been updated', 'success')
         return redirect(url_for('categories'))
     return render_template('updatebrand.html', title='Update Category Page', updatecat=updatecat)
+
+
+@app.route('/deletecat/<int:id>', methods=["POST"])
+def deletecat(id):
+    category = Category.query.get_or_404(id)
+    if request.method == "POST":
+        db.session.delete(category)
+        db.session.commit()
+        flash(f'The category {category.name} was deleted from your database', 'success')
+        return redirect(url_for('admin'))
+    flash(f'The category {category.name} cannot be deleted', 'warning')
+    return redirect(url_for('admin'))
 
 
 @app.route("/addproduct", methods=["GET", "POST"])

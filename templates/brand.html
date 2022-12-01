@@ -58,8 +58,33 @@
                     <td>{{loop.index}}</td>
                     <td>{{ brand.name }}</td>
                     <td><a href="{{url_for('updatebrand', id=brand.id)}}" class="btn btn-sm btn-outline-info">Edit</a></td>
-                    <td><a href="" class="btn btn-sm btn-outline-danger">Delete</a></td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteModal-{{brand.id}}">
+                        Delete
+                        </button>
+                    </td>
                 </tr>
+                <!-- Button trigger modal for deleting -->
+                <!-- Modal -->
+                <div class="modal fade" id="DeleteModal-{{brand.id}}" tabindex="-1" aria-labelledby="BrandModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="BrandModalLabel">Delete brand {{brand.name}}</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                          <p>Do you really want to delete the brand "{{brand.name}}"?</p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <form action="{{url_for('deletebrand', id=brand.id)}}" method="POST">
+                          <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 {% endfor %}
             {% else %}
             {% for category in categories %}
@@ -67,8 +92,33 @@
                     <td>{{loop.index}}</td>
                     <td>{{ category.name }}</td>
                     <td><a href="{{url_for('updatecat', id=category.id)}}" class="btn btn-sm btn-outline-info">Edit</a></td>
-                    <td><a href="" class="btn btn-sm btn-outline-danger">Delete</a></td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteModal-{{category.id}}">
+                            Delete
+                        </button>
+                    </td>
                 </tr>
+                <!-- Button trigger modal for deleting -->
+                <!-- Modal -->
+                <div class="modal fade" id="DeleteModal-{{category.id}}" tabindex="-1" aria-labelledby="CategoryModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="CategoryModalLabel">Delete category {{category.name}}</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                          <p>Do you really want to delete the cateegory "{{category.name}}"?</p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <form action="{{url_for('deletecat', id=category.id)}}" method="POST">
+                          <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 {% endfor %}
             {% endif %}
         </tbody>
