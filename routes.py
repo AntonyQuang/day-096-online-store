@@ -215,13 +215,13 @@ def updateproduct(id):
                 product.image_1 = photos.save(request.files.get("image_1"), name=secrets.token_hex(10) + ".")
         if request.files.get('image_2'):
             try:
-                os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_1))
+                os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_2))
                 product.image_2 = photos.save(request.files.get("image_2"), name=secrets.token_hex(10) + ".")
             except:
                 product.image_12 = photos.save(request.files.get("image_2"), name=secrets.token_hex(10) + ".")
         if request.files.get('image_3'):
             try:
-                os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_1))
+                os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_3))
                 product.image_3 = photos.save(request.files.get("image_3"), name=secrets.token_hex(10) + ".")
             except:
                 product.image_3 = photos.save(request.files.get("image_3"), name=secrets.token_hex(10) + ".")
@@ -235,3 +235,21 @@ def updateproduct(id):
     form.discount.data = product.discount
     form.colors.data = product.colors
     return render_template("updateproduct.html", form=form, brands=brands, categories=categories, product=product)
+
+
+@app.route('/deleteproduct/<int:id>', methods=["POST"])
+def deleteproduct(id):
+    product = AddProduct.query.get_or_404(id)
+    if request.method == "POST":
+        try:
+            os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_1))
+            os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_2))
+            os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_3))
+        except Exception as e:
+            print(e)
+        db.session.delete(product)
+        db.session.commit()
+        flash(f'The product {product.name} was deleted from your database', 'success')
+        return redirect(url_for('admin'))
+    flash(f'The product {product.name} cannot be deleted', 'warning')
+    return redirect(url_for('admin'))

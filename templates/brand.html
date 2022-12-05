@@ -59,12 +59,13 @@
                     <td>{{ brand.name }}</td>
                     <td><a href="{{url_for('updatebrand', id=brand.id)}}" class="btn btn-sm btn-outline-info">Edit</a></td>
                     <td>
+                        <!-- Button trigger modal for deleting brand -->
                         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteModal-{{brand.id}}">
                         Delete
                         </button>
                     </td>
                 </tr>
-                <!-- Button trigger modal for deleting -->
+
                 <!-- Modal -->
                 <div class="modal fade" id="DeleteModal-{{brand.id}}" tabindex="-1" aria-labelledby="BrandModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
@@ -93,12 +94,13 @@
                     <td>{{ category.name }}</td>
                     <td><a href="{{url_for('updatecat', id=category.id)}}" class="btn btn-sm btn-outline-info">Edit</a></td>
                     <td>
+                            <!-- Button trigger modal for deleting category -->
                         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#DeleteModal-{{category.id}}">
                             Delete
                         </button>
                     </td>
                 </tr>
-                <!-- Button trigger modal for deleting -->
+
                 <!-- Modal -->
                 <div class="modal fade" id="DeleteModal-{{category.id}}" tabindex="-1" aria-labelledby="CategoryModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
