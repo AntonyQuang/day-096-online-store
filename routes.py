@@ -7,12 +7,18 @@ import secrets, os
 
 
 @app.route('/')
+def home():
+    products = AddProduct.query.filter(AddProduct.stock > 0)
+    return render_template("products/index.html", title="Home", products=products)
+
+
+@app.route('/admin')
 def admin():
     if 'email' not in session:
         flash(f'Please log in first', 'danger')
         return redirect(url_for('login'))
     products = AddProduct.query.all()
-    return render_template('index.html', title="Admin Page", products=products)
+    return render_template('admin/index.html', title="Admin Page", products=products)
 
 
 @app.route('/brands')
@@ -21,7 +27,7 @@ def brands():
         flash(f'Please log in first', 'danger')
         return redirect(url_for('login'))
     brands = Brand.query.order_by(Brand.id.desc()).all()
-    return render_template('brand.html', title="Brand Page", brands=brands)
+    return render_template('admin/brand.html', title="Brand Page", brands=brands)
 
 
 @app.route('/categories')
@@ -30,7 +36,7 @@ def categories():
         flash(f'Please log in first', 'danger')
         return redirect(url_for('login'))
     categories = Category.query.order_by(Category.id.desc()).all()
-    return render_template('brand.html', title="Brand Page", categories=categories)
+    return render_template('admin/brand.html', title="Brand Page", categories=categories)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -48,7 +54,7 @@ def register():
             db.session.commit()
         flash(f"Welcome {form.name.data}, thank you for registering", "success")
         return redirect(url_for('admin'))
-    return render_template('register.html', form=form, title="Registration Page")
+    return render_template('admin/register.html', form=form, title="Registration Page")
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -185,10 +191,10 @@ def addproduct():
         )
         with app.app_context():
             db.session.add(addpro)
-            flash(f"The product {name} has been added to the database", "success")
+            flash(f"The products {name} has been added to the database", "success")
             db.session.commit()
         return redirect(url_for('admin'))
-    return render_template("addproduct.html", form=form, title="Add product", brands=brands, categories=categories)
+    return render_template("addproduct.html", form=form, title="Add products", brands=brands, categories=categories)
 
 
 @app.route("/updateproduct/<int:id>", methods=["GET", "POST"])
@@ -226,7 +232,7 @@ def updateproduct(id):
             except:
                 product.image_3 = photos.save(request.files.get("image_3"), name=secrets.token_hex(10) + ".")
         db.session.commit()
-        flash(f'Your product has been updated', "success")
+        flash(f'Your products has been updated', "success")
         return redirect(url_for('admin'))
     form.name.data = product.name
     form.price.data = product.price
@@ -249,7 +255,7 @@ def deleteproduct(id):
             print(e)
         db.session.delete(product)
         db.session.commit()
-        flash(f'The product {product.name} was deleted from your database', 'success')
+        flash(f'The products {product.name} was deleted from your database', 'success')
         return redirect(url_for('admin'))
-    flash(f'The product {product.name} cannot be deleted', 'warning')
+    flash(f'The products {product.name} cannot be deleted', 'warning')
     return redirect(url_for('admin'))
