@@ -12,7 +12,7 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/">Home</a>
+                <a class="nav-link active" aria-current="page" href="/">All Products</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('brands') }}">Brands</a>
@@ -22,13 +22,12 @@
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Dropdown
+                  Brands Dropdown
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Action</a></li>
-                  <li><a class="dropdown-item" href="#">Another action</a></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="#">Something else here</a></li>
+                  {% for brand in brands %}
+                  <li><a class="dropdown-item" href="{{url_for('get_brand', id=brand.id)}}">{{brand.name}}</a></li>
+                  {% endfor %}
                 </ul>
               </li>
             </ul>
@@ -44,25 +43,50 @@
 
 <div class="container">
   <div class="row">
-    {% for product in products %}
-    <div class="col-md-3 mt-3">
-      <div class="card">
-        <img src="{{url_for('static', filename='images/' + product.image_1)}}" alt="{{product.name}}" class="card-img-top" height="200">
-        <div class="card-body">
 
-          <h5 class="text-center">{{product.name}}</h5>
-          <p class="text-center">Price: £{{product.price}}</p>
-          {% if product.discount > 0 %}
-          <p class="text-center">{{product.discount}}% off!</p>
-          {% endif %}
-        </div>
-        <div class="card-footer">
-          <a href="#" class="float-start btn btn-sm btn-primary">Details</a>
-          <a href="#" class="float-end btn btn-sm btn-warning">Add to cart</a>
+    {% if brand %}
+        {% for brand_product in brand %}
+      <div class="col-md-3 mt-3">
+        <div class="card">
+          <img src="{{url_for('static', filename='images/' + brand_product.image_1)}}" alt="{{brand_product.name}}" class="card-img-top" height="200">
+          <div class="card-body">
+
+            <h5 class="text-center">{{brand_product.name}}</h5>
+            <p class="text-center">Price: £{{brand_product.price}}</p>
+            {% if brand_product.discount > 0 %}
+            <p class="text-center">{{brand_product.discount}}% off!</p>
+            {% endif %}
+          </div>
+          <div class="card-footer">
+            <a href="#" class="float-start btn btn-sm btn-primary">Details</a>
+            <a href="#" class="float-end btn btn-sm btn-warning">Add to cart</a>
+          </div>
         </div>
       </div>
-    </div>
-    {% endfor %}
+      {% endfor %}
+    {% else %}
+
+
+      {% for product in products %}
+      <div class="col-md-3 mt-3">
+        <div class="card">
+          <img src="{{url_for('static', filename='images/' + product.image_1)}}" alt="{{product.name}}" class="card-img-top" height="200">
+          <div class="card-body">
+
+            <h5 class="text-center">{{product.name}}</h5>
+            <p class="text-center">Price: £{{product.price}}</p>
+            {% if product.discount > 0 %}
+            <p class="text-center">{{product.discount}}% off!</p>
+            {% endif %}
+          </div>
+          <div class="card-footer">
+            <a href="#" class="float-start btn btn-sm btn-primary">Details</a>
+            <a href="#" class="float-end btn btn-sm btn-warning">Add to cart</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% endif %}
   </div>
 
 </div>
