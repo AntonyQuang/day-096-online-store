@@ -8,16 +8,32 @@ import secrets, os
 
 @app.route('/')
 def home():
-    products = AddProduct.query.filter(AddProduct.stock > 0)
-    brands = Brand.query.all()
-    return render_template("products/index.html", title="Home", products=products, brands=brands)
+    page = request.args.get('page',1, type=int)
+    products = AddProduct.query.filter(AddProduct.stock > 0).paginate(page=page, per_page=1)
+    # use the following instead of brands = Brand.query.all() to avoid showing brands with no products
+    brands = Brand.query.join(AddProduct, (Brand.id == AddProduct.brand_id)).all()
+    categories = Category.query.join(AddProduct, (Category.id == AddProduct.category_id)).all()
+    return render_template("products/index.html", title="Home", products=products, brands=brands, categories=categories)
 
 
 @app.route('/brands/<int:id>')
 def get_brand(id):
-    brand = AddProduct.query.filter_by(brand_id=id)
-    brands = Brand.query.all()
-    return render_template("products/index.html", brand=brand, brands=brands)
+    page = request.args.get('page', 1, type=int)
+    brand = AddProduct.query.filter_by(brand_id=id).paginate(page=page, per_page=1)
+    brand_with_id = Category.query.filter_by(id=id).first_or_404()
+    brands = Brand.query.join(AddProduct, (Brand.id == AddProduct.brand_id)).all()
+    categories = Category.query.join(AddProduct, (Category.id == AddProduct.category_id)).all()
+    return render_template("products/index.html", brand=brand, brands=brands, categories=categories, brand_with_id=brand_with_id)
+
+
+@app.route('/categories/<int:id>')
+def get_category(id):
+    page = request.args.get('page',1, type=int)
+    category_with_id = Category.query.filter_by(id=id).first_or_404()
+    category = AddProduct.query.filter_by(category_id=id).paginate(page=page, per_page=2)
+    categories = Category.query.join(AddProduct, (Category.id == AddProduct.category_id)).all()
+    brands = Brand.query.join(AddProduct, (Brand.id == AddProduct.brand_id)).all()
+    return render_template("products/index.html", category=category, categories=categories, brands=brands, category_with_id=category_with_id)
 
 
 @app.route('/admin')
