@@ -16,6 +16,11 @@ def home():
     return render_template("products/index.html", title="Home", products=products, brands=brands, categories=categories)
 
 
+@app.route('/product/<int:id>')
+def single_page(id):
+    product = AddProduct.query.get_or_404(id)
+    return render_template("products/single_page.html", product=product)
+
 @app.route('/brands/<int:id>')
 def get_brand(id):
     page = request.args.get('page', 1, type=int)

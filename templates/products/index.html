@@ -51,6 +51,7 @@
 <!--- navbar ends --->
 
 <div class="container">
+  <!--- Brands --->
   <div class="row">
 
     {% if brand %}
@@ -67,7 +68,7 @@
             {% endif %}
           </div>
           <div class="card-footer">
-            <a href="#" class="float-start btn btn-sm btn-primary">Details</a>
+            <a href="{{url_for('single_page', id=brand_product.id)}}" class="float-start btn btn-sm btn-primary">Details</a>
             <a href="#" class="float-end btn btn-sm btn-warning">Add to cart</a>
           </div>
         </div>
@@ -95,6 +96,8 @@
     {% endif %}
     </div>
   </div>
+
+  <!--- Categories --->
     <div class="row">
     {% elif category %}
 
@@ -111,7 +114,7 @@
             {% endif %}
           </div>
           <div class="card-footer">
-            <a href="#" class="float-start btn btn-sm btn-primary">Details</a>
+            <a href="{{url_for('single_page', id=category_product.id)}}" class="float-start btn btn-sm btn-primary">Details</a>
             <a href="#" class="float-end btn btn-sm btn-warning">Add to cart</a>
           </div>
         </div>
@@ -139,6 +142,8 @@
     {% endif %}
     </div>
   </div>
+
+  <!--- Products --->
     <div class="row">
     {% else %}
 
@@ -156,7 +161,7 @@
             {% endif %}
           </div>
           <div class="card-footer">
-            <a href="#" class="float-start btn btn-sm btn-primary">Details</a>
+            <a href="{{url_for('single_page', id=product.id)}}" class="float-start btn btn-sm btn-primary">Details</a>
             <a href="#" class="float-end btn btn-sm btn-warning">Add to cart</a>
           </div>
         </div>
