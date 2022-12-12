@@ -15,7 +15,7 @@
                 <a class="nav-link active" aria-current="page" href="/">All Products</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('brands') }}">Brands</a>
+                <a class="nav-link" href="{{ url_for('brands') }}">Cart ({{session['Shoppingcart']|length}})</a>
               </li>
                    <!-- Categories Dropdownw -->
               <li class="nav-item dropdown">
@@ -63,9 +63,23 @@
             {% if product.discount > 0 %}
             <p>Product discount: {{ product.discount }}</p>
             {% endif %}
+            <hr>
             <b>Product Description</b>
             <p>{{ product.description }}</p>
-            <a href="#" class="btn btn-warning">Add to Cart</a>
+            <form action="{{url_for('AddCart')}}" method="post">
+                <input type="hidden" name="product_id" value="{{product.id}}">
+                       <button type="submit" class="btn btn-sm btn-warning">Add to cart</button>
+                <hr>
+                <label for="">Quantity</label>
+                <input type="number" name="quantity" id="" value="1" min="1" max="{{product.stock}}">
+                {% set colors = product.colors.split(',') %}
+                       <select name="colors" id="">
+                           {% for color in colors %}
+                               {% set col = color.split(':') %}
+                               <option value="{{col[0]}}">{{col[0]|capitalize}}</option>
+                           {% endfor %}
+                       </select>
+            </form>
         </div>
     </div>
     <div class="row">
