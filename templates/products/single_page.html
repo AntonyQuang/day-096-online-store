@@ -66,7 +66,7 @@
             <hr>
             <b>Product Description</b>
             <p>{{ product.description }}</p>
-            <form action="{{url_for('AddCart')}}" method="post">
+            <form action="{{url_for('add_cart')}}" method="post">
                 <input type="hidden" name="product_id" value="{{product.id}}">
                        <button type="submit" class="btn btn-sm btn-warning">Add to cart</button>
                 <hr>

@@ -292,7 +292,7 @@ def deleteproduct(id):
     return redirect(url_for('admin'))
 
 
-def MergeDict(dict1, dict2):
+def mergedict(dict1, dict2):
     if isinstance(dict1, list) and isinstance(dict2, list):
         return dict1 + dict2
     elif isinstance(dict1, dict) and isinstance(dict2, dict):
@@ -300,7 +300,7 @@ def MergeDict(dict1, dict2):
     return False
 
 @app.route('/addcarts', methods=["POST"])
-def AddCart():
+def add_cart():
     try:
         product_id = request.form.get("product_id")
         quantity = request.form.get("quantity")
@@ -320,7 +320,7 @@ def AddCart():
                 if product_id in session['Shoppingcart']:
                     print("This product is already in your cart")
                 else:
-                    session['Shoppingcart'] = MergeDict(session['Shoppingcart'], DictItems)
+                    session['Shoppingcart'] = mergedict(session['Shoppingcart'], DictItems)
                     return redirect(request.referrer)
             else:
                 session['Shoppingcart'] = DictItems
@@ -329,3 +329,15 @@ def AddCart():
         print(e)
     finally:
         return redirect(request.referrer)
+
+@app.route('/carts')
+def get_cart():
+    if 'Shoppingcart' not in session:
+        return redirect(request.referrer)
+    for key, product in session['Shoppingcart'].items():
+        discount = (product['discount']/100 * float(product['price']))
+        subtotal = float(product['price']* int(product['quantity']))
+        subtotal -= discount
+        tax = ("%.2f") % (0.06 * float(subtotal))
+        grandtotal = float("%.2f" % (1.06 * subtotal))
+    return render_template('carts/carts.html', tax=tax, grandtotal=grandtotal)

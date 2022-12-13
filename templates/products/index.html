@@ -15,7 +15,7 @@
                 <a class="nav-link active" aria-current="page" href="/">All Products</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('brands') }}">Cart ({{session['Shoppingcart']|length}})</a>
+                <a class="nav-link" href="{{ url_for('get_cart') }}">Cart ({{session['Shoppingcart']|length}})</a>
               </li>
                    <!-- Categories Dropdownw -->
               <li class="nav-item dropdown">
@@ -69,7 +69,7 @@
           </div>
           <div class="card-footer">
             <a href="{{url_for('single_page', id=brand_product.id)}}" class="float-start btn btn-sm btn-primary">Details</a>
-            <form action="{{url_for('AddCart')}}" method="post">
+            <form action="{{url_for('add_cart')}}" method="post">
                 <input type="hidden" name="product_id" value="{{brand_product.id}}">
                        <button type="submit" class="btn btn-sm btn-warning float-end">Add to cart</button>
                 <input type="hidden" name="quantity" id="" value="1" min="1" max="{{brand_product.stock}}">
@@ -126,7 +126,7 @@
           </div>
           <div class="card-footer">
             <a href="{{url_for('single_page', id=category_product.id)}}" class="float-start btn btn-sm btn-primary">Details</a>
-            <form action="{{url_for('AddCart')}}" method="post">
+            <form action="{{url_for('add_cart')}}" method="post">
                 <input type="hidden" name="product_id" value="{{category_product.id}}">
                        <button type="submit" class="btn btn-sm btn-warning float-end">Add to cart</button>
                 <input type="hidden" name="quantity" id="" value="1" min="1" max="{{category_product.stock}}">
@@ -184,7 +184,7 @@
           </div>
           <div class="card-footer">
             <a href="{{url_for('single_page', id=product.id)}}" class="float-start btn btn-sm btn-primary">Details</a>
-            <form action="{{url_for('AddCart')}}" method="post">
+            <form action="{{url_for('add_cart')}}" method="post">
                 <input type="hidden" name="product_id" value="{{product.id}}">
                        <button type="submit" class="btn btn-sm btn-warning float-end">Add to cart</button>
                 <input type="hidden" name="quantity" id="" value="1" min="1" max="{{product.stock}}">
