@@ -6,6 +6,7 @@ from models import User, Brand, Category, AddProduct
 import secrets, os
 
 
+
 @app.route('/')
 def home():
     page = request.args.get('page',1, type=int)
@@ -313,7 +314,8 @@ def add_cart():
                               'discount': product.discount,
                               'color': colors,
                               'quantity': quantity,
-                              'image': product.image_1}
+                              'image': product.image_1,
+                              'colors': product.colors,}
                          }
             if 'Shoppingcart' in session:
                 print(session['Shoppingcart'])

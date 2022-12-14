@@ -1,11 +1,14 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div class="container">
+    {% include 'navbar.html' %}
+<div class="container mt-4">
   <div class="row">
+    <div class="col-md-12">
     <table class="table table sm">
       <thead>
         <th>Sr</th>
+        <th>Image</th>
         <th>Name</th>
         <th>Color</th>
         <th>Price</th>
@@ -21,10 +24,21 @@
 
           <tr>
             <td>{{loop.index}}</td>
+            <td><img src="{{url_for('static', filename='images/'+product.image)}}" width="50" height="45" alt="{{product.name}}"></td>
             <td>{{product.name}}</td>
-            <td>{{product.color}}</td>
+            <form action="POST">
+            <td>{% set colors = product.colors.split(',') %}
+                <label for="colors">Colors:</label>
+                       <select name="colors" id="colors">
+                         <option value="{{product.color}}" style="display:none;">{{product.color.title()}}</option>
+                           {% for color in colors %}
+                               {% set col = color.split(':') %}
+                               <option value="{{col[0]}}">{{col[0].title() }}</option>
+                           {% endfor %}
+                       </select>
+            </td>
             <td>£{{product.price}}</td>
-            <td>{{product.quantity}}</td>
+            <td><input type="number" name="quantity" min="1" max="10" value="{{product.quantity}}"></td>
             {% if product.discount > 0 %}
             <td>{{product.discount}}% (£{{ discount }})</td>
             {% else %}
@@ -32,7 +46,7 @@
             {% endif %}
             {% set subtotal = product.quantity|int * product.price|float %}
             <td>£{{ "%0.2f"|format((subtotal|float)-(discount|float)) }}</td>
-            <td><a href="#">Update</a></td>
+            <td><a href="#">Update</a></td></form>
             <td><a href="#">Delete</a></td>
           </tr>
         {% endfor %}
@@ -44,6 +58,7 @@
         </tr>
       </tbody>
     </table>
+      </div>
   </div>
 </div>
 
