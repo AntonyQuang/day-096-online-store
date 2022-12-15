@@ -1,7 +1,9 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    {% include 'navbar.html' %}
+
+{% include 'navbar.html' %}
+{% include '_messages.html' %}
 <div class="container mt-4">
   <div class="row">
     <div class="col-md-12">
@@ -26,10 +28,10 @@
             <td>{{loop.index}}</td>
             <td><img src="{{url_for('static', filename='images/'+product.image)}}" width="50" height="45" alt="{{product.name}}"></td>
             <td>{{product.name}}</td>
-            <form action="POST">
+            <form action="{{url_for('update_cart', code=key)}}" method="POST">
             <td>{% set colors = product.colors.split(',') %}
-                <label for="colors">Colors:</label>
-                       <select name="colors" id="colors">
+                <label for="color">Colors:</label>
+                       <select name="color" id="color">
                          <option value="{{product.color}}" style="display:none;">{{product.color.title()}}</option>
                            {% for color in colors %}
                                {% set col = color.split(':') %}
@@ -46,7 +48,7 @@
             {% endif %}
             {% set subtotal = product.quantity|int * product.price|float %}
             <td>£{{ "%0.2f"|format((subtotal|float)-(discount|float)) }}</td>
-            <td><a href="#">Update</a></td></form>
+            <td><button class="btn btn-sm btn-info" type="submit">Update</button></td></form>
             <td><a href="#">Delete</a></td>
           </tr>
         {% endfor %}

@@ -30,7 +30,7 @@
                  <select name="colors" id="colors" style="visibility: hidden">
                      {% for color in colors %}
                          {% set col = color.split(':') %}
-                         <option value="{{col[0]}}">{{col[0]|.title()}}</option>
+                         <option value="{{col[0]}}">{{col[0].title()}}</option>
                      {% endfor %}
                  </select>
             </form>

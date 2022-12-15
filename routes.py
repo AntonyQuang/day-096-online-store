@@ -338,8 +338,28 @@ def get_cart():
         return redirect(request.referrer)
     for key, product in session['Shoppingcart'].items():
         discount = (product['discount']/100 * float(product['price']))
-        subtotal = float(product['price']* int(product['quantity']))
+        subtotal = float(product['price']) * int(product['quantity'])
         subtotal -= discount
         tax = ("%.2f") % (0.06 * float(subtotal))
         grandtotal = float("%.2f" % (1.06 * subtotal))
     return render_template('carts/carts.html', tax=tax, grandtotal=grandtotal)
+
+
+@app.route('/updatecart/<int:code>', methods=["GET","POST"])
+def update_cart(code):
+    if 'Shoppingcart' not in session and len(session['Shoppingcart']) <= 0:
+        return redirect(url_for("home"))
+    if request.method == "POST":
+        quantity = request.form.get('quantity')
+        color = request.form.get('color')
+        try:
+            session.modified = True
+            for key, item in session["Shoppingcart"].items():
+                if int(key) == code:
+                    item['quantity'] = quantity
+                    item['color'] = color
+                    flash('Cart updated!')
+                    return redirect(url_for('getCart'))
+        except Exception as e:
+            print(e)
+            return redirect(url_for('get_cart'))
