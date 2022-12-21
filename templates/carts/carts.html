@@ -49,11 +49,12 @@
             {% set subtotal = product.quantity|int * product.price|float %}
             <td>£{{ "%0.2f"|format((subtotal|float)-(discount|float)) }}</td>
             <td><button class="btn btn-sm btn-info" type="submit">Update</button></td></form>
-            <td><a href="#">Delete</a></td>
+            <td><a href="{{url_for('delete_item', id=key)}}" class="btn btn-sm btn-danger">Delete</a></td>
           </tr>
         {% endfor %}
         <tr>
           <td></td>
+          <td><a href="{{url_for('home')}}">Check out</a></td></td>
           <td><a href="{{url_for('home')}}">Continue Shopping</a></td>
           <td colspan="3">Tax: £{{tax}}</td>
           <td colspan="4"><h5>Grandtotal: £{{grandtotal}}</h5></td>

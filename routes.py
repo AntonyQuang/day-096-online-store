@@ -6,32 +6,35 @@ from models import User, Brand, Category, AddProduct
 import secrets, os
 
 
+def brands():
+    # use the following instead of brands = Brand.query.all() to avoid showing brands with no products
+    brands = Brand.query.join(AddProduct, (Brand.id == AddProduct.brand_id)).all()
+    return brands
+
+
+def categories():
+    categories = Category.query.join(AddProduct, (Category.id == AddProduct.category_id)).all()
+    return categories
+
 
 @app.route('/')
 def home():
     page = request.args.get('page',1, type=int)
     products = AddProduct.query.filter(AddProduct.stock > 0).paginate(page=page, per_page=1)
-    # use the following instead of brands = Brand.query.all() to avoid showing brands with no products
-    brands = Brand.query.join(AddProduct, (Brand.id == AddProduct.brand_id)).all()
-    categories = Category.query.join(AddProduct, (Category.id == AddProduct.category_id)).all()
-    return render_template("products/index.html", title="Home", products=products, brands=brands, categories=categories)
+    return render_template("products/index.html", title="Home", products=products, brands=brands(), categories=categories())
 
 
 @app.route('/product/<int:id>')
 def single_page(id):
     product = AddProduct.query.get_or_404(id)
-    categories = Category.query.join(AddProduct, (Category.id == AddProduct.category_id)).all()
-    brands = Brand.query.join(AddProduct, (Brand.id == AddProduct.brand_id)).all()
-    return render_template("products/single_page.html", product=product, brands=brands, categories=categories)
+    return render_template("products/single_page.html", product=product, brands=brands(), categories=categories())
 
 @app.route('/brands/<int:id>')
 def get_brand(id):
     page = request.args.get('page', 1, type=int)
     brand = AddProduct.query.filter_by(brand_id=id).paginate(page=page, per_page=1)
     brand_with_id = Category.query.filter_by(id=id).first_or_404()
-    brands = Brand.query.join(AddProduct, (Brand.id == AddProduct.brand_id)).all()
-    categories = Category.query.join(AddProduct, (Category.id == AddProduct.category_id)).all()
-    return render_template("products/index.html", brand=brand, brands=brands, categories=categories, brand_with_id=brand_with_id)
+    return render_template("products/index.html", brand=brand, brands=brands(), categories=categories(), brand_with_id=brand_with_id)
 
 
 @app.route('/categories/<int:id>')
@@ -39,9 +42,7 @@ def get_category(id):
     page = request.args.get('page',1, type=int)
     category_with_id = Category.query.filter_by(id=id).first_or_404()
     category = AddProduct.query.filter_by(category_id=id).paginate(page=page, per_page=2)
-    categories = Category.query.join(AddProduct, (Category.id == AddProduct.category_id)).all()
-    brands = Brand.query.join(AddProduct, (Brand.id == AddProduct.brand_id)).all()
-    return render_template("products/index.html", category=category, categories=categories, brands=brands, category_with_id=category_with_id)
+    return render_template("products/index.html", category=category, categories=categories(), brands=brands(), category_with_id=category_with_id)
 
 
 @app.route('/admin')
@@ -54,7 +55,7 @@ def admin():
 
 
 @app.route('/brands')
-def brands():
+def admin_brands():
     if 'email' not in session:
         flash(f'Please log in first', 'danger')
         return redirect(url_for('login'))
@@ -63,7 +64,7 @@ def brands():
 
 
 @app.route('/categories')
-def categories():
+def admin_ategories():
     if 'email' not in session:
         flash(f'Please log in first', 'danger')
         return redirect(url_for('login'))
@@ -332,22 +333,23 @@ def add_cart():
     finally:
         return redirect(request.referrer)
 
+
 @app.route('/carts')
 def get_cart():
-    if 'Shoppingcart' not in session:
-        return redirect(request.referrer)
+    if 'Shoppingcart' not in session or len(session['Shoppingcart']) <= 0:
+        return redirect(url_for('home'))
     for key, product in session['Shoppingcart'].items():
         discount = (product['discount']/100 * float(product['price']))
         subtotal = float(product['price']) * int(product['quantity'])
         subtotal -= discount
         tax = ("%.2f") % (0.06 * float(subtotal))
         grandtotal = float("%.2f" % (1.06 * subtotal))
-    return render_template('carts/carts.html', tax=tax, grandtotal=grandtotal)
+    return render_template('carts/carts.html', tax=tax, grandtotal=grandtotal, brands=brands(), categories=categories())
 
 
 @app.route('/updatecart/<int:code>', methods=["GET","POST"])
 def update_cart(code):
-    if 'Shoppingcart' not in session and len(session['Shoppingcart']) <= 0:
+    if 'Shoppingcart' not in session or len(session['Shoppingcart']) <= 0:
         return redirect(url_for("home"))
     if request.method == "POST":
         quantity = request.form.get('quantity')
@@ -363,3 +365,18 @@ def update_cart(code):
         except Exception as e:
             print(e)
             return redirect(url_for('get_cart'))
+
+
+@app.route('/deleteitem/<int:id>', methods=["GET"])
+def delete_item(id):
+    if 'Shoppingcart' not in session and len(session['Shoppingcart']) <= 0:
+        return redirect(url_for('get_cart'))
+    try:
+        session.modified = True
+        for key, item in session['Shoppingcart'].items():
+            if int(key) == id:
+                session['Shoppingcart'].pop(key, None)
+                return redirect(url_for('get_cart'))
+    except Exception as e:
+        print(e)
+        return redirect(url_for('get_cart'))
