@@ -305,7 +305,7 @@ def mergedict(dict1, dict2):
 def add_cart():
     try:
         product_id = request.form.get("product_id")
-        quantity = request.form.get("quantity")
+        quantity = int(request.form.get("quantity"))
         colors = request.form.get("colors")
         product = AddProduct.query.filter_by(id=product_id).first()
         if product_id and quantity and colors and request.method == "POST":
@@ -321,7 +321,11 @@ def add_cart():
             if 'Shoppingcart' in session:
                 print(session['Shoppingcart'])
                 if product_id in session['Shoppingcart']:
-                    print("This product is already in your cart")
+                    print(type(product_id))
+                    for key, item in session['Shoppingcart'].items():
+                        if int(key) == int(product_id):
+                            session.modified = True
+                            item['quantity']  += 1
                 else:
                     session['Shoppingcart'] = mergedict(session['Shoppingcart'], DictItems)
                     return redirect(request.referrer)
@@ -361,7 +365,7 @@ def update_cart(code):
                     item['quantity'] = quantity
                     item['color'] = color
                     flash('Cart updated!')
-                    return redirect(url_for('getCart'))
+                    return redirect(url_for('get_cart'))
         except Exception as e:
             print(e)
             return redirect(url_for('get_cart'))
@@ -380,3 +384,12 @@ def delete_item(id):
     except Exception as e:
         print(e)
         return redirect(url_for('get_cart'))
+
+@app.route('/clear_cart')
+def clear_cart():
+    try:
+        # we don't use session.clear() because that will log the user out
+        session.pop('Shoppingcart', None)
+        return redirect(url_for('home'))
+    except Exception as e:
+        print(e)
