@@ -1,6 +1,6 @@
 from flask import render_template, session, request, url_for, flash, redirect, current_app
 from forms import RegistrationForm, LoginForm, AddProductsForm
-from __init__ import app, db, bcrypt, photos
+from __init__ import app, db, bcrypt, photos, search
 from models import User, Brand, Category, AddProduct
 
 import secrets, os
@@ -23,6 +23,12 @@ def home():
     products = AddProduct.query.filter(AddProduct.stock > 0).paginate(page=page, per_page=1)
     return render_template("products/index.html", title="Home", products=products, brands=brands(), categories=categories())
 
+
+@app.route('/result')
+def result():
+    searchword = request.args.get('q')
+    products = AddProduct.query.msearch(searchword, fields=["name", "description"], limit=6)
+    return render_template('products/result.html', products=products, brands=brands(), categories=categories())
 
 @app.route('/product/<int:id>')
 def single_page(id):
