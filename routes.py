@@ -1,5 +1,5 @@
 from flask import render_template, session, request, url_for, flash, redirect, current_app
-from forms import RegistrationForm, LoginForm, AddProductsForm
+from forms import RegistrationForm, LoginForm, AddProductsForm, CustomerRegistrationForm
 from __init__ import app, db, bcrypt, photos, search
 from models import User, Brand, Category, AddProduct
 
@@ -399,3 +399,9 @@ def clear_cart():
         return redirect(url_for('home'))
     except Exception as e:
         print(e)
+
+
+@app.route('/customer/register', methods=["GET", "POST"])
+def customer_register():
+    form = CustomerRegistrationForm(request.form)
+    return render_template('customer/register.html', form=form)
