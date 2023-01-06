@@ -56,6 +56,27 @@ class AddProduct(db.Model):
     def __repr__(self):
         return "<AddProduct %r>" % self.name
 
+
+class Customer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), unique=False, nullable=False)
+    username = db.Column(db.String, unique=True, nullable=False)
+    email = db.Column(db.String, unique=True, nullable=False)
+    password = db.Column(db.String(180), unique=False, nullable=False)
+    country = db.Column(db.String(50), unique=False, nullable=False)
+    state = db.Column(db.String(50), unique=False, nullable=True)
+    city = db.Column(db.String(50), unique=False, nullable=False)
+    contact = db.Column(db.String(30), unique=False, nullable=False)
+    address_1 = db.Column(db.String(80), unique=False, nullable=False)
+    address_2 = db.Column(db.String(80), unique=False, nullable=True)
+    zipcode = db.Column(db.String(30), unique=False, nullable=False)
+    profile = db.Column(db.String(180), unique=False, nullable=False, default="profile.jpg")
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __repr__(self):
+        return "<Register %r>" % self.name
+
+
 with app.app_context():
     db.create_all()
     db.session.commit()

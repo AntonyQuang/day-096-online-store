@@ -1,7 +1,7 @@
 from flask import render_template, session, request, url_for, flash, redirect, current_app
 from forms import RegistrationForm, LoginForm, AddProductsForm, CustomerRegistrationForm
 from __init__ import app, db, bcrypt, photos, search
-from models import User, Brand, Category, AddProduct
+from models import User, Brand, Category, AddProduct, Customer
 
 import secrets, os
 
@@ -70,7 +70,7 @@ def admin_brands():
 
 
 @app.route('/categories')
-def admin_ategories():
+def admin_categories():
     if 'email' not in session:
         flash(f'Please log in first', 'danger')
         return redirect(url_for('login'))
@@ -404,4 +404,22 @@ def clear_cart():
 @app.route('/customer/register', methods=["GET", "POST"])
 def customer_register():
     form = CustomerRegistrationForm(request.form)
+    if request.method == "POST":
+        hash_password = bcrypt.generate_password_hash(form.password.data)
+        register = Customer(name=form.name.data,
+                            username=form.username.data,
+                            email=form.email.data,
+                            password=hash_password,
+                            country=form.country.data,
+                            address_1=form.address_1.data,
+                            address_2=form.address_2.data,
+                            city=form.city.data,
+                            state=form.state.data,
+                            zipcode=form.zipcode.data,
+                            contact=form.contact.data)
+        with app.app_context():
+            db.session.add(register)
+            db.session.commit()
+        flash(f'Welcome {form.name.data}. Thank you for registering', 'success')
+        return redirect(url_for('home'))
     return render_template('customer/register.html', form=form)
