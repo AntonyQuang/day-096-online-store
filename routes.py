@@ -1,6 +1,7 @@
 from flask import render_template, session, request, url_for, flash, redirect, current_app
-from forms import RegistrationForm, LoginForm, AddProductsForm, CustomerRegistrationForm
-from __init__ import app, db, bcrypt, photos, search
+from forms import RegistrationForm, LoginForm, AddProductsForm, CustomerRegistrationForm, CustomerLoginForm
+from __init__ import app, db, bcrypt, photos, search, login_manager
+from flask_login import login_required, current_user, logout_user, login_user
 from models import User, Brand, Category, AddProduct, Customer
 
 import secrets, os
@@ -19,6 +20,7 @@ def categories():
 
 @app.route('/')
 def home():
+    # session.clear()
     page = request.args.get('page',1, type=int)
     products = AddProduct.query.filter(AddProduct.stock > 0).paginate(page=page, per_page=1)
     return render_template("products/index.html", title="Home", products=products, brands=brands(), categories=categories())
@@ -403,8 +405,8 @@ def clear_cart():
 
 @app.route('/customer/register', methods=["GET", "POST"])
 def customer_register():
-    form = CustomerRegistrationForm(request.form)
-    if request.method == "POST":
+    form = CustomerRegistrationForm()
+    if form.validate_on_submit():
         hash_password = bcrypt.generate_password_hash(form.password.data)
         register = Customer(name=form.name.data,
                             username=form.username.data,
@@ -416,10 +418,26 @@ def customer_register():
                             city=form.city.data,
                             state=form.state.data,
                             zipcode=form.zipcode.data,
-                            contact=form.contact.data)
+                            )
         with app.app_context():
             db.session.add(register)
             db.session.commit()
+        print("success")
         flash(f'Welcome {form.name.data}. Thank you for registering', 'success')
         return redirect(url_for('home'))
+    print(form.errors)
     return render_template('customer/register.html', form=form)
+
+@app.route('/customer/login', methods=["GET", "POST"])
+def customer_login():
+    form = CustomerLoginForm()
+    if form.validate_on_submit():
+        user = Customer.query.filter_by(email=form.email.data).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            login_user(user)
+            flash("You have logged in", "success")
+            next = request.args.get('next')
+            return redirect(next or url_for('home'))
+        flash("Incorrect email and/or password", "danger")
+        return redirect(url_for("customer_login"))
+    return render_template('/customer/login.html', form=form)

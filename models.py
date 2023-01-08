@@ -1,6 +1,7 @@
-from __init__ import db
+from __init__ import db, login_manager
 from __init__ import app
 from datetime import datetime
+from flask_login import UserMixin
 import sqlalchemy.types as types
 
 
@@ -56,25 +57,28 @@ class AddProduct(db.Model):
     def __repr__(self):
         return "<AddProduct %r>" % self.name
 
+@login_manager.user_loader
+def user_loader(user_id):
+    return Customer.query.get(user_id)
 
-class Customer(db.Model):
+class Customer(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), unique=False, nullable=False)
     username = db.Column(db.String, unique=True, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.String(180), unique=False, nullable=False)
     country = db.Column(db.String(50), unique=False, nullable=False)
-    state = db.Column(db.String(50), unique=False, nullable=True)
+    state = db.Column(db.String(50), unique=False)
     city = db.Column(db.String(50), unique=False, nullable=False)
-    contact = db.Column(db.String(30), unique=False, nullable=False)
+    contact = db.Column(db.String(30), unique=False)
     address_1 = db.Column(db.String(80), unique=False, nullable=False)
-    address_2 = db.Column(db.String(80), unique=False, nullable=True)
+    address_2 = db.Column(db.String(80), unique=False)
     zipcode = db.Column(db.String(30), unique=False, nullable=False)
-    profile = db.Column(db.String(180), unique=False, nullable=False, default="profile.jpg")
+    profile = db.Column(db.String(180), unique=False, default="profile.jpg")
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
-        return "<Register %r>" % self.name
+        return "<Customer %r>" % self.name
 
 
 with app.app_context():

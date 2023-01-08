@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_uploads import IMAGES, UploadSet, configure_uploads
 import os
 from flask_msearch import Search
+from flask_login import LoginManager
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 # Creating a Flask instance
@@ -21,3 +22,9 @@ db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 search = Search()
 search.init_app(app)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'customer_login'
+login_manager.needs_refresh_message_category="danger"
+login_manager.login_message = u"Please login first"
