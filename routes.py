@@ -435,9 +435,16 @@ def customer_login():
         user = Customer.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
-            flash("You have logged in", "success")
             next = request.args.get('next')
+            flash("You have logged in", "success")
             return redirect(next or url_for('home'))
         flash("Incorrect email and/or password", "danger")
         return redirect(url_for("customer_login"))
     return render_template('/customer/login.html', form=form)
+
+
+@app.route('/customer/logout', methods=["GET"])
+def customer_logout():
+    logout_user()
+    flash("You have logged out", "info")
+    return redirect(url_for('home'))

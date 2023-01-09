@@ -11,10 +11,11 @@
               <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="/">All Products</a>
               </li>
+              <!-- Cart -->
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('get_cart') }}">Cart ({{session['Shoppingcart']|length}})</a>
               </li>
-                   <!-- Categories Dropdownw -->
+                   <!-- Categories Dropdown -->
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Categories
@@ -25,7 +26,7 @@
                   {% endfor %}
                 </ul>
               </li>
-                   <!-- Brands Dropdownw -->
+                   <!-- Brands Dropdown -->
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Brands
@@ -36,6 +37,22 @@
                   {% endfor %}
                 </ul>
               </li>
+              <!-- Log out -->
+              {% if current_user.is_authenticated %}
+                <li class="nav-item">
+                  <a href="{{url_for('customer_logout')}}" class="nav-link">{{current_user.name}}</a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{url_for('customer_logout')}}" class="nav-link">Log out</a>
+                </li>
+              {% else %}
+                <li class="nav-item">
+                  <a href="{{url_for('customer_login')}}" class="nav-link">Log in</a>
+                </li>
+              <li class="nav-item">
+                  <a href="{{url_for('customer_register')}}" class="nav-link">Sign up</a>
+                </li>
+              {% endif %}
             </ul>
             <form class="d-flex" role="search" action="{{url_for('result')}}">
               <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">
