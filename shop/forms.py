@@ -2,7 +2,7 @@ from wtforms import Form, BooleanField, StringField, PasswordField, TextAreaFiel
     DecimalField, SubmitField, ValidationError
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from flask_wtf import FlaskForm
-from models import Customer
+from shop.models import Customer
 
 
 class RegistrationForm(Form):

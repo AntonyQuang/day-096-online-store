@@ -1,5 +1,5 @@
-from __init__ import db, login_manager
-from __init__ import app
+from shop import db, login_manager
+from shop import app
 from datetime import datetime
 from flask_login import UserMixin
 import sqlalchemy.types as types
@@ -37,6 +37,7 @@ class AddProduct(db.Model):
     __searchable__ = ["name", "description"]
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
+    f_name = db.Column(db.String(80))
     price = db.Column(db.Numeric(10,2), nullable=False)
     discount = db.Column(db.Integer, default=0)
     stock = db.Column(db.Integer, nullable=False)

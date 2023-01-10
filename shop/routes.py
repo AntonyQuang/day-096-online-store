@@ -1,8 +1,8 @@
 from flask import render_template, session, request, url_for, flash, redirect, current_app
-from forms import RegistrationForm, LoginForm, AddProductsForm, CustomerRegistrationForm, CustomerLoginForm
-from __init__ import app, db, bcrypt, photos, search, login_manager
-from flask_login import login_required, current_user, logout_user, login_user
-from models import User, Brand, Category, AddProduct, Customer
+from shop.forms import RegistrationForm, LoginForm, AddProductsForm, CustomerRegistrationForm, CustomerLoginForm
+from shop import app, db, bcrypt, photos
+from flask_login import logout_user, login_user
+from shop.models import User, Brand, Category, AddProduct, Customer
 
 import secrets, os
 
@@ -23,7 +23,7 @@ def home():
     # session.clear()
     page = request.args.get('page',1, type=int)
     products = AddProduct.query.filter(AddProduct.stock > 0).paginate(page=page, per_page=1)
-    return render_template("products/index.html", title="Home", products=products, brands=brands(), categories=categories())
+    return render_template("/products/index.html", title="Home", products=products, brands=brands(), categories=categories())
 
 
 @app.route('/result')
