@@ -37,7 +37,6 @@ class AddProduct(db.Model):
     __searchable__ = ["name", "description"]
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
-    f_name = db.Column(db.String(80))
     price = db.Column(db.Numeric(10,2), nullable=False)
     discount = db.Column(db.Integer, default=0)
     stock = db.Column(db.Integer, nullable=False)
