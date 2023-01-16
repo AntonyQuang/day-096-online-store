@@ -1,8 +1,8 @@
 from flask import render_template, session, request, url_for, flash, redirect, current_app
 from shop.forms import RegistrationForm, LoginForm, AddProductsForm, CustomerRegistrationForm, CustomerLoginForm
 from shop import app, db, bcrypt, photos
-from flask_login import logout_user, login_user
-from shop.models import User, Brand, Category, AddProduct, Customer
+from flask_login import logout_user, login_user, login_required, current_user
+from shop.models import User, Brand, Category, AddProduct, Customer, CustomerOrder
 
 import secrets, os
 
@@ -448,3 +448,24 @@ def customer_logout():
     logout_user()
     flash("You have logged out", "info")
     return redirect(url_for('home'))
+
+
+@app.route('/getorder/')
+@login_required
+def get_order():
+    if current_user.is_authenticated:
+        customer_id = current_user.id
+        invoice = secrets.token_hex(5)
+        try:
+            order = CustomerOrder(invoice=invoice, customer_id=customer_id, orders=session["Shoppingcart"])
+            with app.app_context():
+                db.session.add(order)
+                db.session.commit()
+            session.pop('Shoppingcart')
+            flash("Your order has been sent successfully", "success")
+            return redirect(url_for("home"))
+
+        except Exception as e:
+            print(e)
+            flash('Something went wrong while getting your order', 'danger')
+            return redirect(url_for('get_cart'))
