@@ -463,9 +463,31 @@ def get_order():
                 db.session.commit()
             session.pop('Shoppingcart')
             flash("Your order has been sent successfully", "success")
-            return redirect(url_for("home"))
+            return redirect(url_for("orders", invoice=invoice))
 
         except Exception as e:
             print(e)
             flash('Something went wrong while getting your order', 'danger')
             return redirect(url_for('get_cart'))
+
+
+@app.route('/orders/<invoice>')
+@login_required
+def orders(invoice):
+    if current_user.is_authenticated:
+        grand_total = 0
+        subtotal = 0
+        customer_id = current_user.id
+        customer = Customer.query.filter_by(id=customer_id).first()
+        # order by descending, get the first result
+        orders = CustomerOrder.query.filter_by(customer_id=customer_id).order_by(CustomerOrder.id.desc()).first()
+        for key,product in orders.orders.items():
+            discount = (product['discount']/100) * float(product['price'])
+            subtotal += float(product['price']) * int(product["quantity"])
+            subtotal -= discount
+            tax = ("%.2f" % (.6 * float(subtotal)))
+            grand_total = float("%.f" % (1.06 * subtotal))
+    else:
+        return redirect(url_for("customer_login"))
+    return render_template('/customer/order.html', invoice=invoice, tax=tax, subtotal=subtotal, grand_total=grand_total, customer=customer, orders=orders)
+
