@@ -1,9 +1,9 @@
-from flask import render_template, session, request, url_for, flash, redirect, current_app
+from flask import render_template, session, request, url_for, flash, redirect, current_app, make_response
 from shop.forms import RegistrationForm, LoginForm, AddProductsForm, CustomerRegistrationForm, CustomerLoginForm
 from shop import app, db, bcrypt, photos
 from flask_login import logout_user, login_user, login_required, current_user
 from shop.models import User, Brand, Category, AddProduct, Customer, CustomerOrder
-
+import pdfkit
 import secrets, os
 
 
@@ -491,3 +491,30 @@ def orders(invoice):
         return redirect(url_for("customer_login"))
     return render_template('/customer/order.html', invoice=invoice, tax=tax, subtotal=subtotal, grand_total=grand_total, customer=customer, orders=orders)
 
+
+@app.route('/get_pdf/<invoice>', methods=["POST"])
+@login_required
+def get_pdf(invoice):
+    if current_user.is_authenticated:
+        grand_total = 0
+        subtotal = 0
+        customer_id = current_user.id
+        if request.method == "POST":
+            customer = Customer.query.filter_by(id=customer_id).first()
+            # order by descending, get the first result
+            orders = CustomerOrder.query.filter_by(customer_id=customer_id).order_by(CustomerOrder.id.desc()).first()
+            for key,product in orders.orders.items():
+                discount = (product['discount']/100) * float(product['price'])
+                subtotal += float(product['price']) * int(product["quantity"])
+                subtotal -= discount
+                tax = ("%.2f" % (.6 * float(subtotal)))
+                grand_total = float("%.f" % (1.06 * subtotal))
+            rendered = render_template('/customer/pdf.html', invoice=invoice, tax=tax, grand_total=grand_total, customer=customer, orders=orders)
+            config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
+            pdf = pdfkit.from_string(rendered, configuration=config)
+            response = make_response(pdf)
+            response.headers['content-Type'] = 'application/pdf'
+            response.headers['content-Disposition'] = 'inline: filename=' + invoice + '.pdf'
+            # response.headers['content-Disposition'] = 'attached; filename=' + invoice + '.pdf'
+            return response
+    return redirect(url_for('orders'))
