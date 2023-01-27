@@ -1,10 +1,12 @@
-from flask import render_template, session, request, url_for, flash, redirect, current_app, make_response
+from flask import render_template, session, request, url_for, flash, redirect, current_app, make_response, jsonify
 from shop.forms import RegistrationForm, LoginForm, AddProductsForm, CustomerRegistrationForm, CustomerLoginForm
 from shop import app, db, bcrypt, photos
 from flask_login import logout_user, login_user, login_required, current_user
 from shop.models import User, Brand, Category, AddProduct, Customer, CustomerOrder
 import pdfkit
 import secrets, os
+import stripe
+
 
 
 def brands():
@@ -25,7 +27,7 @@ def home():
     products = AddProduct.query.filter(AddProduct.stock > 0).paginate(page=page, per_page=1)
     return render_template("/products/index.html", title="Home", products=products, brands=brands(), categories=categories())
 
-
+# Search functionality
 @app.route('/result')
 def result():
     searchword = request.args.get('q')
@@ -350,12 +352,15 @@ def add_cart():
 def get_cart():
     if 'Shoppingcart' not in session or len(session['Shoppingcart']) <= 0:
         return redirect(url_for('home'))
+    subtotal=0
+    grandtotal=0
+    tax=0
     for key, product in session['Shoppingcart'].items():
-        discount = (product['discount']/100 * float(product['price']))
-        subtotal = float(product['price']) * int(product['quantity'])
+        discount = (product['discount'] / 100) * float(product['price']) * int(product["quantity"])
+        subtotal += float(product['price']) * int(product["quantity"])
         subtotal -= discount
-        tax = ("%.2f") % (0.06 * float(subtotal))
-        grandtotal = float("%.2f" % (1.06 * subtotal))
+        tax = ("%.2f" % (.06 * float(subtotal)))
+        grandtotal = float("%.f" % (1.06 * subtotal))
     return render_template('carts/carts.html', tax=tax, grandtotal=grandtotal, brands=brands(), categories=categories())
 
 
@@ -461,7 +466,7 @@ def get_order():
             with app.app_context():
                 db.session.add(order)
                 db.session.commit()
-            session.pop('Shoppingcart')
+
             flash("Your order has been sent successfully", "success")
             return redirect(url_for("orders", invoice=invoice))
 
@@ -482,10 +487,10 @@ def orders(invoice):
         # order by descending, get the first result
         orders = CustomerOrder.query.filter_by(customer_id=customer_id).order_by(CustomerOrder.id.desc()).first()
         for key,product in orders.orders.items():
-            discount = (product['discount']/100) * float(product['price'])
+            discount = (product['discount']/100) * float(product['price']) * int(product["quantity"])
             subtotal += float(product['price']) * int(product["quantity"])
             subtotal -= discount
-            tax = ("%.2f" % (.6 * float(subtotal)))
+            tax = ("%.2f" % (.06 * float(subtotal)))
             grand_total = float("%.f" % (1.06 * subtotal))
     else:
         return redirect(url_for("customer_login"))
@@ -504,10 +509,10 @@ def get_pdf(invoice):
             # order by descending, get the first result
             orders = CustomerOrder.query.filter_by(customer_id=customer_id).order_by(CustomerOrder.id.desc()).first()
             for key,product in orders.orders.items():
-                discount = (product['discount']/100) * float(product['price'])
+                discount = (product['discount']/100) * float(product['price']) * int(product["quantity"])
                 subtotal += float(product['price']) * int(product["quantity"])
                 subtotal -= discount
-                tax = ("%.2f" % (.6 * float(subtotal)))
+                tax = ("%.2f" % (.06 * float(subtotal)))
                 grand_total = float("%.f" % (1.06 * subtotal))
             rendered = render_template('/customer/pdf.html', invoice=invoice, tax=tax, grand_total=grand_total, customer=customer, orders=orders)
             config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
@@ -518,3 +523,57 @@ def get_pdf(invoice):
             # response.headers['content-Disposition'] = 'attached; filename=' + invoice + '.pdf'
             return response
     return redirect(url_for('orders'))
+
+
+@app.route('/create-payment-intent/<invoice>', methods=['GET', 'POST'])
+def create_payment(invoice):
+    if current_user.is_authenticated:
+        line_items = []
+        grand_total = 0
+        subtotal = 0
+        customer_id = current_user.id
+        customer = Customer.query.filter_by(id=customer_id).first()
+        # order by descending, get the first result
+        orders = CustomerOrder.query.filter_by(customer_id=customer_id).order_by(CustomerOrder.id.desc()).first()
+        for key,product in orders.orders.items():
+            discount = (product['discount']/100) * float(product['price'])
+            subtotal = float(product['price'])
+            subtotal -= discount
+            tax = ("%.2f" % (.06 * float(subtotal)))
+            grand_total = int(float("%.f" % (1.06 * subtotal))*100)
+            line_item_entry = {
+                "price_data": {
+                    'currency': "gbp",
+                    'unit_amount': grand_total,
+                    'product_data': {
+                        'name': product['name']
+                    },
+                },
+                'quantity': int(product["quantity"]),
+            }
+            line_items.append(line_item_entry)
+        print(line_items)
+
+        try:
+            checkout_session = stripe.checkout.Session.create(
+                line_items=line_items,
+                mode='payment',
+                success_url='http://127.0.0.1:5000'+ '/success',
+                cancel_url='http://127.0.0.1:5000'+ '/cancel',
+            )
+        except Exception as e:
+            return str(e)
+
+        return redirect(checkout_session.url, code=303)
+    return redirect(url_for('orders'))
+
+
+@app.route('/success')
+def success():
+    session.pop('Shoppingcart')
+    return render_template('/customer/success.html')
+
+
+@app.route('/cancel')
+def cancel():
+    return render_template('/customer/cancel.html')

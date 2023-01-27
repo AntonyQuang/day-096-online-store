@@ -6,8 +6,10 @@ import os
 from flask_msearch import Search
 from flask_login import LoginManager
 from flask_migrate import Migrate
+import stripe
 
 basedir = os.path.abspath(os.path.dirname(__file__))
+stripe.api_key = 'SecretKey'
 # Creating a Flask instance
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "SecretKey"

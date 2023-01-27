@@ -22,7 +22,7 @@
       </thead>
       <tbody>
         {% for key, product in session['Shoppingcart'].items() %}
-        {% set discount = "%0.2f"|format((product.discount/100)*product.price|float) %}
+        {% set discount = "%0.2f"|format((product.discount/100)*product.price|float*product.quantity|int) %}
 
           <tr>
             <td>{{loop.index}}</td>
